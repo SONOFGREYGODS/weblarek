@@ -119,7 +119,7 @@ const openSuccess = (total: number) => {
 const placeOrder = () => {
   const order: IOrder = {
     ...buyerModel.getBuyer(),
-    id: basketModel.getBasket().map((item) => item.id),
+    items: basketModel.getBasket().map((item) => item.id),
     total: basketModel.priceBasket(),
   };
   api

@@ -39,7 +39,7 @@ export type ApiResponse = {
 };
 
 export interface IOrder extends IBuyer {
-  id: string[];
+  items: string[];
   total: number;
 }
 
