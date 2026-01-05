@@ -1,9 +1,10 @@
 import { IBuyer, TPayment, TValidationErrors } from "../../types/index";
+import { IEvents } from "../base/Events";
 
 export class ModelBuyer {
   protected buyer: IBuyer;
 
-  constructor() {
+  constructor(protected events: IEvents) {
     this.buyer = {
       address: "",
       email: "",
@@ -14,18 +15,22 @@ export class ModelBuyer {
 
   setPayment(payment: TPayment): void {
     this.buyer.payment = payment;
+    this.events.emit("buyer:changed");
   }
 
   setEmail(email: string): void {
     this.buyer.email = email;
+    this.events.emit("buyer:changed");
   }
 
   setPhone(phone: string): void {
     this.buyer.phone = phone;
+    this.events.emit("buyer:changed");
   }
 
   setAddress(address: string): void {
     this.buyer.address = address;
+    this.events.emit("buyer:changed");
   }
 
   getBuyer(): IBuyer {
@@ -39,6 +44,7 @@ export class ModelBuyer {
       payment: "",
       phone: "",
     };
+    this.events.emit("buyer:changed");
   }
 
   validateBuyer(): TValidationErrors {

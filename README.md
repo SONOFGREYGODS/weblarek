@@ -137,10 +137,14 @@ Presenter - презентер содержит основную логику п
 
 **Хранение товаров, которые можно купить в приложении**
 
+Конструктор:  
+`constructor(events: IEvents)` — принимает брокер событий.
+
 #### Поля
 
 - **\_items: IProduct[]** — хранилище всех товаров
 - **\_current: IProduct|null** — id просматриваемого товара
+- **events: IEvents** — брокер событий
 
 #### Методы
 
@@ -154,9 +158,13 @@ Presenter - презентер содержит основную логику п
 
 **Хранение товаров, которые пользователь выбрал для покупки**
 
+Конструктор:  
+`constructor(events: IEvents)` — принимает брокер событий.
+
 #### Поля
 
 - **\_basket: IProduct[]** — хранит массив товаров, выбранных покупателем для покупки
+- **events: IEvents** — брокер событий
 
 #### Методы
 
@@ -172,12 +180,16 @@ Presenter - презентер содержит основную логику п
 
 **Данные покупателя, которые тот должен указать при оформлении заказа**
 
+Конструктор:  
+`constructor(events: IEvents)` — принимает брокер событий.
+
 #### Поля класса Customer
 
 - **setPayment(payment: TPayment): void** — виды оплаты покупателя
 - **setAddress(address: string): void** — адрес покупателя
 - **setPhone(phone: string): void** — телефон покупателя
 - **setEmail(email: string): void** — почта покупателя
+- **events: IEvents** — брокер событий
 
 #### Методы класса Customer
 
@@ -194,3 +206,195 @@ Presenter - презентер содержит основную логику п
 Методы:
 **getCatalog(): Promise<IProduct[]>** -> получение товаров
 **postOrder(order: IOrder): Promise<IOrderResult>** -> отправка данных о покупке
+
+## Слой представления (View)
+
+### Page
+
+Отвечает за шапку приложения и галерею карточек.
+Конструктор:  
+`constructor(container: HTMLElement, events: IEvents)`
+
+Поля:
+- `.header__basket` — кнопка открытия корзины
+- `.header__basket-counter` — счётчик товаров в корзине
+- `.gallery` — контейнер каталога
+
+События:
+- `basket:open` — нажатие на иконку корзины
+
+Методы:
+- `render(data?: Partial<TPageState>): HTMLElement` — рендер с передачей `gallery` и `counter`
+
+### Modal
+
+Отображает модальные окна, управляет открытием и закрытием.
+Конструктор:  
+`constructor(container: HTMLElement, events: IEvents)`
+
+Поля:
+- `.modal__content` — контейнер для контента
+- `.modal__close` — кнопка закрытия
+
+События:
+- `modal:close` — закрытие по клику на крестик или на оверлей
+
+Методы:
+- `open(): void` — показать модальное окно (модификатор `modal_active`)
+- `close(): void` — скрыть окно и очистить контент
+- `render(data?: Partial<TModalData>): HTMLElement` — рендер контента
+
+### Catalog
+
+Отображает список карточек в каталоге (галерея).
+Конструктор:  
+`constructor(container: HTMLElement)`
+
+Методы:
+- `render(data?: Partial<{ items: HTMLElement[] }>): HTMLElement` — рендер галереи
+
+### Card (родительский класс карточек)
+
+Общий функционал для карточек:
+- отображение заголовка, цены, категории, изображения
+- установка модификатора категории по `categoryMap`
+
+Конструктор:  
+`constructor(container: HTMLElement)`
+
+Поля:
+- `.card__title`, `.card__price`, `.card__category`, `.card__image`, `.card__text`
+
+Методы:
+- `render(data?: Partial<TCardData>): HTMLElement` — рендер карточки
+
+### CatalogCard
+
+Карточка для каталога, открывает просмотр товара.
+Конструктор:  
+`constructor(container: HTMLElement, events: IEvents)`
+
+События:
+- `card:select` — выбор карточки для просмотра
+
+### PreviewCard
+
+Карточка просмотра товара в модальном окне.
+Конструктор:  
+`constructor(container: HTMLElement, events: IEvents)`
+
+События:
+- `card:buy` — добавление товара в корзину
+- `card:remove` — удаление товара из корзины
+
+### BasketCard
+
+Карточка товара в корзине.
+Конструктор:  
+`constructor(container: HTMLElement, events: IEvents)`
+
+События:
+- `basket:remove` — удаление товара из корзины
+
+### Basket
+
+Отображает список товаров в корзине и итоговую стоимость.
+Конструктор:  
+`constructor(container: HTMLElement, events: IEvents)`
+
+События:
+- `basket:checkout` — переход к оформлению заказа
+
+Методы:
+- `render(data?: Partial<TBasketView>): HTMLElement` — рендер списка и суммы
+
+### Form (родительский класс форм)
+
+Общий функционал для форм:
+- обработка изменений полей
+- управление доступностью кнопок
+- отображение ошибок
+
+Конструктор:  
+`constructor(container: HTMLFormElement, events: IEvents, changeEvent: string, submitEvent: string)`
+
+Поля:
+- `submitButton: HTMLButtonElement`
+- `errorsElement: HTMLElement`
+- `inputs: HTMLInputElement[]`
+
+Методы:
+- `render(data?: Partial<TFormState & T>): HTMLElement` — рендер состояния формы
+
+### OrderForm
+
+Форма выбора способа оплаты и адреса.
+Конструктор:  
+`constructor(container: HTMLFormElement, events: IEvents)`
+
+Поля:
+- `addressInput: HTMLInputElement`
+- `paymentButtons: HTMLButtonElement[]`
+
+События:
+- `order:change` — изменение данных формы оплаты/адреса
+- `order:submit` — переход ко второй форме оформления
+
+### ContactsForm
+
+Форма ввода контактов.
+Конструктор:  
+`constructor(container: HTMLFormElement, events: IEvents)`
+
+Поля:
+- `emailInput: HTMLInputElement`
+- `phoneInput: HTMLInputElement`
+
+События:
+- `contacts:change` — изменение данных формы контактов
+- `contacts:submit` — оплата/завершение оформления заказа
+
+### Success
+
+Экран успешной оплаты.
+Конструктор:  
+`constructor(container: HTMLElement, events: IEvents)`
+
+Поля:
+- `.order-success__description` — сумма списания
+- `.order-success__close` — кнопка закрытия
+
+События:
+- `success:close` — закрытие экрана успеха
+
+## События приложения
+
+### События моделей
+
+- `catalog:changed` — изменение каталога товаров
+- `product:selected` — изменение выбранного товара
+- `basket:changed` — изменение содержимого корзины
+- `buyer:changed` — изменение данных покупателя
+
+### События представлений
+
+- `card:select` — выбор карточки для просмотра
+- `card:buy` — добавление товара в корзину
+- `card:remove` — удаление товара из корзины
+- `basket:open` — открытие корзины
+- `basket:remove` — удаление товара из корзины
+- `basket:checkout` — начало оформления заказа
+- `order:change` — изменение данных формы оплаты/адреса
+- `order:submit` — переход ко второй форме оформления заказа
+- `contacts:change` — изменение данных формы контактов
+- `contacts:submit` — оплата заказа
+- `success:close` — закрытие окна успешной оплаты
+- `modal:close` — закрытие модального окна
+
+## Презентер
+
+Презентер реализован в `src/main.ts`. Он подписывается на события Моделей и Представлений, получает данные от Моделей и передает их в Представления. В презентере нет генерации событий — он только обрабатывает их, связывает обновления данных с ререндером компонентов и управляет открытием модальных окон.
+
+## UML
+
+UML-схема классов не добавлена. При необходимости можно добавить PNG/JPEG с диаграммой в корень проекта и сослаться на неё в этом разделе.
