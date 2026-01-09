@@ -5,7 +5,7 @@ import { ensureElement, createElement } from "../../utils/utils";
 export type TBasketView = {
   items: HTMLElement[];
   total: number;
-  isEmpty: boolean;
+  isCheckoutDisabled: boolean;
 };
 
 export class Basket extends Component<TBasketView> {
@@ -41,7 +41,7 @@ export class Basket extends Component<TBasketView> {
     this.totalElement.textContent = `${value} синапсов`;
   }
 
-  set isEmpty(value: boolean) {
+  set isCheckoutDisabled(value: boolean) {
     this.buttonElement.disabled = value;
   }
 }

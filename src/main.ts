@@ -9,11 +9,13 @@ import { EventEmitter } from "./components/base/Events";
 import { cloneTemplate, ensureElement } from "./utils/utils";
 import Catalog from "./components/view/catalog";
 import { Basket } from "./components/view/basket";
-import { BasketCard, CatalogCard, PreviewCard } from "./components/view/cards";
+import { BasketCard } from "./components/view/basket-card";
+import { CatalogCard } from "./components/view/catalog-card";
+import { PreviewCard } from "./components/view/preview-card";
 import { Modal } from "./components/view/modal";
 import { OrderForm } from "./components/view/order-form";
 import { ContactsForm } from "./components/view/contacts-form";
-import { Page } from "./components/view/page";
+import { Header } from "./components/view/header";
 import { Success } from "./components/view/success";
 import { IProduct, IOrder } from "./types";
 
@@ -25,7 +27,7 @@ const buyerModel = new ModelBuyer(events);
 const baseApi = new Api(API_URL);
 const api = new ShopAPI(baseApi, CDN_URL);
 
-const page = new Page(document.body, events);
+const header = new Header(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>("#modal-container"), events);
 const catalogView = new Catalog(ensureElement<HTMLElement>(".gallery"));
 const basketView = new Basket(cloneTemplate("#basket"), events);
@@ -50,9 +52,9 @@ const renderBasket = () => {
   basketView.render({
     items: cards,
     total: basketModel.priceBasket(),
-    isEmpty: items.length === 0,
+    isCheckoutDisabled: items.length === 0,
   });
-  page.render({ counter: basketModel.countBasket() });
+  header.render({ counter: basketModel.countBasket() });
 };
 
 const updateOrderForm = () => {
@@ -154,17 +156,13 @@ events.on<{ id: string }>("card:select", ({ id }) => {
   catalogModel.setCurrent(item);
 });
 
-events.on<{ id: string }>("card:buy", ({ id }) => {
+events.on<{ id: string; inBasket: boolean }>("card:toggle", ({ id, inBasket }) => {
   const item = catalogModel.getProduct(id);
-  if (!basketModel.isInBasket(item)) {
+  if (inBasket) {
+    basketModel.removeFromBasket(item);
+  } else if (!basketModel.isInBasket(item)) {
     basketModel.addToBasket(item);
   }
-  modal.close();
-});
-
-events.on<{ id: string }>("card:remove", ({ id }) => {
-  const item = catalogModel.getProduct(id);
-  basketModel.removeFromBasket(item);
   modal.close();
 });
 

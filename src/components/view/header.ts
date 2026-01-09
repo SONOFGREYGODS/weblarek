@@ -2,15 +2,13 @@ import { Component } from "../base/Component";
 import { IEvents } from "../base/Events";
 import { ensureElement } from "../../utils/utils";
 
-export type TPageState = {
-  gallery: HTMLElement[];
+export type THeaderState = {
   counter: number;
 };
 
-export class Page extends Component<TPageState> {
+export class Header extends Component<THeaderState> {
   protected counterElement: HTMLElement;
   protected basketButton: HTMLButtonElement;
-  protected galleryElement: HTMLElement;
 
   constructor(container: HTMLElement, protected events: IEvents) {
     super(container);
@@ -22,7 +20,6 @@ export class Page extends Component<TPageState> {
       ".header__basket",
       container
     );
-    this.galleryElement = ensureElement<HTMLElement>(".gallery", container);
 
     this.basketButton.addEventListener("click", () => {
       this.events.emit("basket:open");
@@ -31,9 +28,5 @@ export class Page extends Component<TPageState> {
 
   set counter(value: number) {
     this.counterElement.textContent = String(value);
-  }
-
-  set gallery(value: HTMLElement[]) {
-    this.galleryElement.replaceChildren(...value);
   }
 }
