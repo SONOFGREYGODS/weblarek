@@ -156,11 +156,11 @@ events.on<{ id: string }>("card:select", ({ id }) => {
   catalogModel.setCurrent(item);
 });
 
-events.on<{ id: string; inBasket: boolean }>("card:toggle", ({ id, inBasket }) => {
+events.on<{ id: string }>("card:toggle", ({ id }) => {
   const item = catalogModel.getProduct(id);
-  if (inBasket) {
+  if (basketModel.isInBasket(item)) {
     basketModel.removeFromBasket(item);
-  } else if (!basketModel.isInBasket(item)) {
+  } else {
     basketModel.addToBasket(item);
   }
   modal.close();

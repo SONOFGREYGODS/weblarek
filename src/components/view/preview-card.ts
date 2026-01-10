@@ -4,7 +4,6 @@ import { Card } from "./card";
 
 export class PreviewCard extends Card {
   protected buttonElement: HTMLButtonElement;
-  protected inBasketValue = false;
 
   constructor(container: HTMLElement, protected events: IEvents) {
     super(container);
@@ -16,10 +15,7 @@ export class PreviewCard extends Card {
       if (!this.idValue) {
         return;
       }
-      this.events.emit("card:toggle", {
-        id: this.idValue,
-        inBasket: this.inBasketValue,
-      });
+      this.events.emit("card:toggle", { id: this.idValue });
     });
   }
 
@@ -35,9 +31,5 @@ export class PreviewCard extends Card {
     if (!this.buttonElement.disabled) {
       this.buttonElement.textContent = value;
     }
-  }
-
-  set inBasket(value: boolean) {
-    this.inBasketValue = value;
   }
 }
